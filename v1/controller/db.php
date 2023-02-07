@@ -6,8 +6,8 @@ class DB {
 
     public static function connectWriteDB(){
         if(self::$writeDBConnection == null){
+            // self::$writeDBConnection = new PDO('mysql:host=localhost;dbname=dating;', 'root', 'root');
             self::$writeDBConnection = new PDO('mysql:host=191.101.79.103;dbname=u618358202_pt;', 'u618358202_pt', '7#qWhy@2mSJyiyd');
-            // self::$writeDBConnection = new PDO('mysql:host=191.101.79.103;dbname=u618358202_pt;', 'u618358202_pt', '7#qWhy@2mSJyiyd');
             self::$writeDBConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             self::$writeDBConnection->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
         }
