@@ -4,7 +4,7 @@ require_once('db.php');
 require_once('../model/response.php');
 require_once('../model/im_msg.php');
 
-$allowed_chats = array("new", "to_user", "from_user");
+
 try
 {
     $writeDB = DB::connectWriteDB();
@@ -165,13 +165,9 @@ if(array_key_exists("id", $_GET)){
         exit;
     }
 } 
-elseif (isset($_GET[$chat]) && in_array($_GET[$chat], $allowed_chats)) {
-    
-    $chat =  $_GET[$chat];
-    
-    $chatArray = array($new, $to_user, $from_user);
-
-    $new = $_GET['new'];
+elseif(array_key_exists("chat", $_GET) && array_key_exists("to_user", $_GET) && array_key_exists("from_user", $_GET)) {
+        
+    $chat =  $_GET['chat'];
     $to_user =  $_GET['to_user'];
     $from_user =  $_GET['from_user'];
    
@@ -184,28 +180,8 @@ elseif (isset($_GET[$chat]) && in_array($_GET[$chat], $allowed_chats)) {
         exit;
     } 
 
-    if($_SERVER['CONTENT_TYPE'] !== 'application/json'){
-        $response = new Response();
-        $response->setHttpStatusCode(400);
-        $response->setSuccess(false);
-        $response->addMessage("Content Type header not set to JSON");
-        $response->send();
-        exit;
-    }
-
-    $rawGetData = file_get_contents('php://input');
-
-    if(!$jsonData = json_decode($rawGetData)){
-        $response = new Response();
-        $response->setHttpStatusCode(400);
-        $response->setSuccess(false);
-        $response->addMessage("Request body is not valid JSON");
-        $response->send();
-        exit;
-    }
-
     
-    if($new == '' || !is_numeric($new)){
+    if($chat == '' || !is_numeric($chat)){
         $response = new Response();
         $response->setHttpStatusCode(400);
         $response->setSuccess(false);
@@ -214,10 +190,23 @@ elseif (isset($_GET[$chat]) && in_array($_GET[$chat], $allowed_chats)) {
         exit();
     }
 
-    $chat = $jsonData->chat;
-    $to_user = $jsonData->to_user;
-    $from_user = $jsonData->from_user;
+    if($to_user == '' || !is_numeric($to_user)){
+        $response = new Response();
+        $response->setHttpStatusCode(400);
+        $response->setSuccess(false);
+        $response->addMessage("new cannot or must be numeric");
+        $response->send();
+        exit();
+    }
 
+    if($from_user == '' || !is_numeric($from_user)){
+        $response = new Response();
+        $response->setHttpStatusCode(400);
+        $response->setSuccess(false);
+        $response->addMessage("new cannot or must be numeric");
+        $response->send();
+        exit();
+    }
     if($_SERVER['REQUEST_METHOD'] === 'GET'){
 
         try {
@@ -624,6 +613,19 @@ elseif (array_key_exists("user_id", $_GET)) {
     }
     
 } elseif (empty($_GET)){  
+
+
+    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+        header('Access-Control-Allow-Mehtods: POST, GET, OPTIONS');
+        header('Access-Control-Allow-Headers: Content-Type');
+        header('Access-Control-Max-Age: 86400');
+        $response = new Response();
+        $response->setHttpStatusCode(200);
+        $response->setSuccess(true);
+        $response->send();
+        exit;
+    }
+
     if($_SERVER['REQUEST_METHOD'] === 'GET') {
 
         if($_SERVER['CONTENT_TYPE'] !== 'application/json'){
